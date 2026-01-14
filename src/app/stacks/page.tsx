@@ -1,99 +1,71 @@
-'use client';
 
-import Image from 'next/image';
 import { stacks } from '@/data/stacks';
-import { useState, useEffect } from 'react';
-import { auth, db } from '@/lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, setDoc, arrayUnion, getDoc } from 'firebase/firestore';
+import Image from 'next/image';
+import Link from 'next/link';
 
-export default function Stacks() {
-  const [user, setUser] = useState<any>(null);
-  const [savedStacks, setSavedStacks] = useState<string[]>([]);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        getDoc(userDocRef).then((docSnap) => {
-          if (docSnap.exists()) {
-            setSavedStacks(docSnap.data().savedStacks || []);
-          }
-        });
-      } else {
-        setSavedStacks([]);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleSaveStack = async (stackId: string) => {
-    if (!user) {
-      alert('Please log in to save stacks.');
-      return;
-    }
-    const userDocRef = doc(db, 'users', user.uid);
-    try {
-      await setDoc(userDocRef, {
-        savedStacks: arrayUnion(stackId)
-      }, { merge: true });
-      setSavedStacks([...savedStacks, stackId]);
-      alert('Stack saved successfully!');
-    } catch (error) {
-      console.error('Error saving stack: ', error);
-      alert('Failed to save stack.');
-    }
-  };
-
+export default function StacksPage() {
   return (
-    <div className="bg-gray-50">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-800 sm:text-5xl md:text-6xl">
+    <div className="bg-gray-50 min-h-screen">
+      <main className="container mx-auto px-4 py-12">
+        <header className="text-center mb-12">
+          <h1 className="text-5xl font-extrabold text-gray-900 leading-tight">
             Curated Health Stacks
           </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
-            Discover personalized health stacks to optimize your well-being.
+          <p className="mt-4 text-xl text-gray-600">
+            Explore our expertly crafted stacks to boost your health and wellness.
           </p>
-        </div>
+        </header>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {stacks.map((stack) => (
-            <div key={stack.id} className="bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition duration-300">
-              <Image src={stack.imageUrl} alt={stack.name} width={400} height={224} className="w-full h-56 object-cover" />
+            <div key={stack.id} className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+              <div className="relative h-48 w-full">
+                <Image
+                  src={stack.imageUrl}
+                  alt={stack.name}
+                  layout="fill"
+                  objectFit="cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                  <h2 className="text-2xl font-bold text-white text-center p-4">{stack.name}</h2>
+                </div>
+              </div>
               <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">{stack.name}</h2>
-                <p className="text-gray-600 mb-4">{stack.description}</p>
+                <p className="text-gray-700 mb-4">{stack.description}</p>
+                
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Components:</h3>
+                  <h3 className="font-semibold text-gray-800 mb-2">Components:</h3>
                   <ul className="list-disc list-inside text-gray-600">
                     {stack.components.map((component, index) => (
-                      <li key={index}>{component.name} - {component.dosage}</li>
+                      <li key={index}>{component.name} ({component.dosage})</li>
                     ))}
                   </ul>
                 </div>
-                <div className="flex justify-between items-center">
-                    <a href={stack.purchaseUrl} target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300">
-                      Buy Now
-                    </a>
-                    {user && (
-                        <button
-                          onClick={() => handleSaveStack(stack.id.toString())}
-                          disabled={savedStacks.includes(stack.id.toString())}
-                          className={`inline-block font-bold py-2 px-4 rounded-full transition duration-300 ${
-                            savedStacks.includes(stack.id.toString())
-                              ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                              : 'bg-green-500 hover:bg-green-600 text-white'
-                          }`}>
-                          {savedStacks.includes(stack.id.toString()) ? 'Saved' : 'Save Stack'}
-                        </button>
-                    )}
+
+                <div className="mt-6 flex flex-col items-center">
+                  <a
+                    href={stack.purchaseUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-green-500 text-white font-bold py-3 px-6 rounded-lg text-center hover:bg-green-600 transition-colors duration-300 mb-3"
+                  >
+                    Buy on Amazon
+                  </a>
+                  <div className="flex space-x-3">
+                    <p className="text-sm text-gray-500">Share:</p>
+                    <Link href={`https://twitter.com/intent/tweet?text=Check out this health stack: ${stack.name}&url=${stack.purchaseUrl}`}>
+                      <a target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-500">Twitter</a>
+                    </Link>
+                    <Link href={`https://www.facebook.com/sharer/sharer.php?u=${stack.purchaseUrl}`}>
+                      <a target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">Facebook</a>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

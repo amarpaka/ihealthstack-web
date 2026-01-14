@@ -50,10 +50,10 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-green-500 opacity-90"></div>
         <div className="relative container mx-auto px-4 py-32 text-center">
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-4">
-            Your Personal Health Stack, Simplified.
+            "Launching Soon: Your Personal Agent to Power Your Health Boost"
           </h1>
           <p className="text-xl md:text-2xl mb-8">
-            Discover and build your personalized health stack with the power of AI.
+            Get ready to unlock your optimal health potential.
           </p>
           <a
             href="#chatbot"
@@ -76,7 +76,7 @@ export default function Home() {
                 <div key={index} className={`flex items-start ${msg.role === 'user' ? 'justify-end' : ''}`}>
                   {msg.role === 'ai' && <div className="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 flex-shrink-0">Concierge</div>}
                   <div className={`bg-gray-100 rounded-lg p-4 ${msg.role === 'user' ? 'bg-blue-100' : ''}`}>
-                    <p>{msg.content}</p>
+                    <p className="text-gray-800 dark:text-gray-200">{msg.content}</p>
                   </div>
                    {msg.role === 'user' && <div className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center font-bold ml-4 flex-shrink-0">You</div>}
                 </div>
