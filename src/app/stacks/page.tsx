@@ -23,8 +23,6 @@ export default function StacksPage() {
                 <Image
                   src={stack.imageUrl}
                   alt={stack.name}
-                  layout="fill"
-                  objectFit="cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                   <h2 className="text-2xl font-bold text-white text-center p-4">{stack.name}</h2>
